@@ -1,66 +1,242 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Todo List API Documentation
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Persiapan
+1. Clone repository ini
+2. Install dependencies:
+```bash
+composer install
+```
+3. Copy .env.example ke .env dan sesuaikan konfigurasi database
+4. Generate application key:
+```bash
+php artisan key:generate
+```
+5. Generate JWT secret:
+```bash
+php artisan jwt:secret
+```
+6. Jalankan migrations:
+```bash
+php artisan migrate
+```
+7. Jalankan server:
+```bash
+php artisan serve
+```
 
-## About Laravel
+## Testing API dengan Postman
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 1. API Login
+```
+POST /api/login
+Content-Type: application/json
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Request Body:
+{
+    "email": "user@example.com",
+    "password": "password123"
+}
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Response Success (200):
+{
+    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+    "token_type": "bearer",
+    "expires_in": 3600
+}
+```
 
-## Learning Laravel
+### 2. API Registrasi
+```
+POST /api/register
+Content-Type: application/json
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Request Body:
+{
+    "name": "User Test",
+    "email": "user@example.com",
+    "password": "password123"
+}
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Response Success (201):
+{
+    "message": "User successfully registered",
+    "user": {
+        "name": "User Test",
+        "email": "user@example.com",
+        "id": 1
+    },
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+}
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. API Membuat Checklist
+```
+POST /api/checklists
+Authorization: Bearer {token}
+Content-Type: application/json
 
-## Laravel Sponsors
+Request Body:
+{
+    "name": "Daily Tasks",
+    "description": "Tasks for today"
+}
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Response Success (201):
+{
+    "id": 1,
+    "name": "Daily Tasks",
+    "description": "Tasks for today",
+    "user_id": 1,
+    "created_at": "2024-01-08T..."
+}
+```
 
-### Premium Partners
+### 4. API Menghapus Checklist
+```
+DELETE /api/checklists/{id}
+Authorization: Bearer {token}
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+Response Success (204 No Content)
+```
 
-## Contributing
+### 5. API Menampilkan Checklist
+```
+GET /api/checklists
+Authorization: Bearer {token}
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Response Success (200):
+[
+    {
+        "id": 1,
+        "name": "Daily Tasks",
+        "description": "Tasks for today",
+        "items": []
+    }
+]
+```
 
-## Code of Conduct
+### 6. API Detail Checklist
+```
+GET /api/checklists/{id}
+Authorization: Bearer {token}
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Response Success (200):
+{
+    "id": 1,
+    "name": "Daily Tasks",
+    "description": "Tasks for today",
+    "items": [
+        {
+            "id": 1,
+            "name": "Buy groceries",
+            "is_completed": false
+        }
+    ]
+}
+```
 
-## Security Vulnerabilities
+### 7. API Membuat Item dalam Checklist
+```
+POST /api/checklists/{checklist_id}/items
+Authorization: Bearer {token}
+Content-Type: application/json
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Request Body:
+{
+    "name": "Buy groceries"
+}
 
-## License
+Response Success (201):
+{
+    "id": 1,
+    "checklist_id": 1,
+    "name": "Buy groceries",
+    "is_completed": false
+}
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 8. API Detail Item
+```
+GET /api/items/{id}
+Authorization: Bearer {token}
+
+Response Success (200):
+{
+    "id": 1,
+    "checklist_id": 1,
+    "name": "Buy groceries",
+    "is_completed": false
+}
+```
+
+### 9. API Mengubah Item
+```
+PUT /api/items/{id}
+Authorization: Bearer {token}
+Content-Type: application/json
+
+Request Body:
+{
+    "name": "Buy groceries and fruits"
+}
+
+Response Success (200):
+{
+    "id": 1,
+    "name": "Buy groceries and fruits",
+    "is_completed": false
+}
+```
+
+### 10. API Mengubah Status Item
+```
+PATCH /api/items/{id}/status
+Authorization: Bearer {token}
+Content-Type: application/json
+
+Request Body:
+{
+    "is_completed": true
+}
+
+Response Success (200):
+{
+    "id": 1,
+    "name": "Buy groceries and fruits",
+    "is_completed": true
+}
+```
+
+### 11. API Menghapus Item
+```
+DELETE /api/items/{id}
+Authorization: Bearer {token}
+
+Response Success (204 No Content)
+```
+
+## Urutan Testing yang Disarankan
+1. Register user baru (API #2)
+2. Login dengan user yang sudah dibuat (API #1)
+3. Buat checklist baru (API #3)
+4. Tampilkan daftar checklist (API #5)
+5. Lihat detail checklist (API #6)
+6. Buat item dalam checklist (API #7)
+7. Lihat detail item (API #8)
+8. Ubah nama item (API #9)
+9. Ubah status item (API #10)
+10. Hapus item (API #11)
+11. Hapus checklist (API #4)
+
+## Catatan Penting
+- Semua endpoint kecuali login dan register memerlukan token JWT
+- Token harus disertakan di header sebagai Bearer token
+- Response codes:
+  - 200: Success
+  - 201: Created
+  - 204: No Content
+  - 400: Bad Request
+  - 401: Unauthorized
+  - 404: Not Found
+  - 422: Validation Error
+- Validasi input dilakukan untuk memastikan data yang dimasukkan sesuai
